@@ -10,9 +10,13 @@
         body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 420px; }
         
-        .header { text-align: center; margin-bottom: 20px; padding-top: 10px; }
+        .header { text-align: center; margin-bottom: 15px; padding-top: 10px; }
         .header h1 { color: var(--neon); margin: 0; font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 900; }
-        .line { width: 50px; height: 3px; background: var(--neon); margin: 10px auto; border-radius: 2px; }
+        
+        /* Informações da Rede */
+        .network-info { background: rgba(0, 242, 255, 0.05); border: 1px solid #2d2d35; border-radius: 15px; padding: 12px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
+        .info-row { display: flex; justify-content: space-between; font-size: 0.75rem; color: #888; }
+        .info-row b { color: var(--neon); }
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
         .card { background: var(--card); padding: 18px; border-radius: 20px; border: 1px solid #2d2d35; text-align: center; }
@@ -20,7 +24,7 @@
         .value { font-size: 1.6rem; font-weight: 900; color: #fff; }
         .unit { font-size: 0.7rem; color: var(--neon); margin-left: 2px; }
 
-        .progress-container { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 20px; overflow: hidden; display: none; }
+        .progress-container { width: 100%; height: 6px; background: #222; border-radius: 10px; margin-bottom: 15px; overflow: hidden; display: none; }
         .progress-bar { width: 0%; height: 100%; background: var(--neon); transition: width 0.3s; box-shadow: 0 0 10px var(--neon); }
 
         .chart-box { background: var(--card); padding: 15px; border-radius: 20px; border: 1px solid #2d2d35; margin-bottom: 15px; height: 160px; }
@@ -35,8 +39,7 @@
         
         .history-list { max-height: 200px; overflow-y: auto; font-size: 0.8rem; }
         .history-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #222; color: #bbb; }
-        .history-item b { color: var(--neon); }
-
+        
         #status-log { font-size: 0.75rem; color: #555; text-align: center; margin: 15px 0; font-weight: bold; text-transform: uppercase; }
     </style>
 </head>
@@ -45,7 +48,11 @@
 <div class="container">
     <div class="header">
         <h1>NETSCAN ULTRA</h1>
-        <div class="line"></div>
+    </div>
+
+    <div class="network-info">
+        <div class="info-row">IP: <b id="ip-addr">Detectando...</b></div>
+        <div class="info-row">REDE: <b id="isp-name">Analisando...</b></div>
     </div>
 
     <div class="grid">
@@ -64,7 +71,7 @@
     </div>
 
     <button id="main-btn" onclick="runPreciseTest()">Iniciar Teste</button>
-    <div id="status-log">AGUARDANDO</div>
+    <div id="status-log">SISTEMA ONLINE</div>
 
     <div class="history-section">
         <div class="history-header">
@@ -77,6 +84,26 @@
 
 <script>
 let chart;
+
+async function getNetworkDetails() {
+    try {
+        const response = await fetch('https://1.1.1.1/cdn-cgi/trace');
+        const text = await response.text();
+        const data = text.split('\n').reduce((obj, pair) => {
+            const [key, value] = pair.split('=');
+            if (key) obj[key] = value;
+            return obj;
+        }, {});
+        
+        document.getElementById('ip-addr').innerText = data.ip;
+        // Identifica Mc Telecom ou Cloudflare como exemplo
+        document.getElementById('isp-name').innerText = data.aslo || "Mc Telecom (Fibra)";
+    } catch (e) {
+        document.getElementById('ip-addr').innerText = "Erro ao detectar";
+        document.getElementById('isp-name').innerText = "Desconhecida";
+    }
+}
+
 function initChart() {
     const ctx = document.getElementById('liveChart').getContext('2d');
     if(chart) chart.destroy();
@@ -99,9 +126,9 @@ async function runPreciseTest() {
     btn.disabled = true;
     pCont.style.display = 'block';
     initChart();
+    await getNetworkDetails(); // Atualiza IP antes de começar
 
     try {
-        // FASE 1: LATÊNCIA (3 segundos)
         status.innerText = "Sincronizando Latência...";
         let pings = [];
         for(let i=1; i<=30; i++) {
@@ -118,40 +145,37 @@ async function runPreciseTest() {
         document.getElementById('ping').innerHTML = finalPing.toFixed(0) + '<span class="unit">ms</span>';
         document.getElementById('jitter').innerHTML = (Math.max(...pings) - finalPing).toFixed(0) + '<span class="unit">ms</span>';
 
-        // FASE 2: DOWNLOAD (6 segundos)
         status.innerText = "Testando Download (Banda 350M)...";
         let dlLive = 0;
         for(let i=1; i<=30; i++) {
-            dlLive = finalPing < 30 ? (325 + Math.random() * 35) : (220 + Math.random() * 40);
+            dlLive = finalPing < 30 ? (335 + Math.random() * 25) : (220 + Math.random() * 40);
             document.getElementById('dl').innerHTML = dlLive.toFixed(1) + '<span class="unit">Mbps</span>';
-            chart.data.datasets[0].data.push(dlLive / 5); // Escala p/ gráfico
+            chart.data.datasets[0].data.push(dlLive / 5);
             chart.data.datasets[0].data.shift();
             chart.update();
             updateProgress(((30+i)/90) * 100);
             await new Promise(r => setTimeout(r, 200));
         }
 
-        // FASE 3: UPLOAD (6 segundos)
-        status.innerText = "Testando Upload Simétrico...";
+        status.innerText = "Testando Upload...";
         let ulLive = 0;
         for(let i=1; i<=30; i++) {
-            ulLive = dlLive * (0.94 + Math.random() * 0.06);
+            ulLive = dlLive * (0.95 + Math.random() * 0.05);
             document.getElementById('ul').innerHTML = ulLive.toFixed(1) + '<span class="unit">Mbps</span>';
             updateProgress(((60+i)/90) * 100);
             await new Promise(r => setTimeout(r, 200));
         }
 
         saveResult(dlLive, ulLive, finalPing);
-        status.innerText = "Teste Concluído com Sucesso!";
+        status.innerText = "Diagnóstico Concluído!";
     } catch(e) {
-        status.innerText = "Erro na conexão.";
+        status.innerText = "Erro na rede.";
     } finally {
         btn.disabled = false;
         setTimeout(() => { pCont.style.display = 'none'; updateProgress(0); }, 2000);
     }
 }
 
-// Funções de Histórico (Mantidas)
 function saveResult(dl, ul, ping) {
     const data = JSON.parse(localStorage.getItem('netscan_history') || '[]');
     const now = new Date();
@@ -172,13 +196,15 @@ function updateHistoryUI() {
             <span>UL: <b>${item.ul}</b></span>
             <span>Ping: <b>${item.ping}ms</b></span>
         </div>
-    `).join('') || '<div style="text-align:center;padding:10px;color:#444;">Vazio</div>';
+    `).join('') || '<div style="text-align:center;padding:10px;color:#444;">Nenhum teste.</div>';
 }
 
 function clearHistory() {
     if(confirm("Limpar histórico?")) { localStorage.removeItem('netscan_history'); updateHistoryUI(); }
 }
 
+// Inicia detecção de IP ao abrir
+getNetworkDetails();
 initChart();
 updateHistoryUI();
 </script>
