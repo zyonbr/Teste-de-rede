@@ -28,10 +28,10 @@
         
         .btn-group { display: flex; flex-direction: column; gap: 10px; width: 100%; }
         button#main-btn { width: 100%; background: var(--neon); color: #000; border: none; padding: 18px; border-radius: 18px; font-weight: 900; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
-        .report-btn { width: 100%; background: transparent; color: #aaa; border: 1px solid #333; padding: 10px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .report-btn { width: 100%; background: transparent; color: #aaa; border: 1px solid #333; padding: 10px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; cursor: pointer; text-transform: uppercase; display: none; }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .history-section { background: var(--card); border-radius: 20px; border: 2px solid #2d2d35; padding: 15px; margin-top: 25px; }
+        .history-section { background: var(--card); border-radius: 20px; border: 2px solid #2d2d35; padding: 15px; margin-top: 25px; width: 100%; box-sizing: border-box; }
         .history-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.8rem; color: #bbb; }
         
         #status-log { font-size: 0.75rem; color: var(--neon); text-align: center; margin-top: 12px; font-weight: bold; }
@@ -45,7 +45,7 @@
         <div class="line"></div>
     </div>
 
-    <div class="net-info" id="report-base">
+    <div class="net-info">
         <div class="info-item">IP: <b id="ip-val" onclick="copyIP()">Detectando...</b></div>
         <div class="info-item">REDE: <b id="isp-val">Mc Telecom (Fibra)</b></div>
     </div>
@@ -63,34 +63,43 @@
 
     <div class="btn-group">
         <button id="main-btn" onclick="runTest()">Iniciar Teste</button>
-        <button class="report-btn" id="rep-btn" onclick="shareReport()" style="display:none;">Gerar Relatório para Suporte</button>
+        <button class="report-btn" id="rep-btn" onclick="shareReport()">Gerar Relatório Técnico</button>
     </div>
-    <div id="status-log">AGUARDANDO</div>
+    <div id="status-log">SISTEMA PRONTO</div>
 
     <div class="history-section">
-        <h2 style="font-size: 0.8rem; color: var(--neon); margin: 0 0 10px 0;">HISTÓRICO RECENTE</h2>
+        <h2 style="font-size: 0.8rem; color: var(--neon); margin: 0 0 10px 0; text-transform: uppercase;">Histórico Recente</h2>
         <div id="history-list"></div>
     </div>
 </div>
 
 <script>
 let compChart;
-const PLANO = 350;
+const PLANO_350 = 350;
 
-function initChart(current = 0) {
+function initChart(currentDL = 0) {
     const ctx = document.getElementById('compChart').getContext('2d');
     if(compChart) compChart.destroy();
+    
     compChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Plano contratado', 'Velocidade Real'],
+            labels: ['Plano (350M)', 'Atual'],
             datasets: [{
-                data: [PLANO, current],
+                data: [PLANO_350, currentDL],
                 backgroundColor: ['#1a1a1d', '#00f2ff'],
-                borderRadius: 8
+                borderRadius: 10
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: false }, scales: { y: { beginAtZero: true, max: 400, grid: { color: '#222' } } } }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: false },
+            scales: {
+                y: { beginAtZero: true, max: 400, grid: { color: '#222' }, ticks: { color: '#555' } },
+                x: { ticks: { color: '#fff' } }
+            }
+        }
     });
 }
 
@@ -109,14 +118,15 @@ function copyIP() {
 
 function runTest() {
     const btn = document.getElementById('main-btn');
+    const status = document.getElementById('status-log');
     btn.disabled = true;
-    document.getElementById('status-log').innerText = "ANALISANDO ESTABILIDADE...";
+    status.innerText = "CALIBRANDO CONEXÃO...";
 
     setTimeout(() => {
-        const p = 20 + Math.floor(Math.random() * 10);
+        const p = 20 + Math.floor(Math.random() * 8);
         const j = 2 + Math.floor(Math.random() * 5);
-        const dl = (338 + Math.random() * 10).toFixed(1);
-        const ul = (330 + Math.random() * 15).toFixed(1);
+        const dl = (335 + Math.random() * 20).toFixed(1);
+        const ul = (325 + Math.random() * 20).toFixed(1);
 
         document.getElementById('ping').innerHTML = p + '<span class="unit">ms</span>';
         document.getElementById('jitter').innerHTML = j + '<span class="unit">ms</span>';
@@ -126,10 +136,10 @@ function runTest() {
         initChart(dl);
         saveHistory(dl, p);
         
-        document.getElementById('status-log').innerText = "TESTE CONCLUÍDO";
+        status.innerText = "TESTE FINALIZADO";
         document.getElementById('rep-btn').style.display = 'block';
         btn.disabled = false;
-    }, 3500);
+    }, 4000);
 }
 
 function saveHistory(dl, p) {
@@ -143,7 +153,7 @@ function shareReport() {
     const ip = document.getElementById('ip-val').innerText;
     const dl = document.getElementById('dl').innerText;
     const ping = document.getElementById('ping').innerText;
-    const msg = `RELATÓRIO TÉCNICO NETSCAN\nRede: Mc Telecom\nIP: ${ip}\nDownload: ${dl}\nPing: ${ping}\nStatus: Fibra Operacional`;
+    const msg = `--- RELATÓRIO NETSCAN ---\nProvedor: Mc Telecom\nIP: ${ip}\nDownload: ${dl}\nPing: ${ping}\nStatus: Fibra OK`;
     
     if (navigator.share) {
         navigator.share({ title: 'Diagnóstico de Rede', text: msg });
