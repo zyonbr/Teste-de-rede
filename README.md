@@ -1,4 +1,3 @@
-# Teste-de-rede
 <!DOCTYPE html>
 <html lang="pt-pt">
 <head>
@@ -18,7 +17,7 @@
         .value { font-size: 1.3rem; font-weight: bold; margin-top: 5px; }
         .unit { font-size: 0.7rem; color: var(--neon); margin-left: 2px; }
         .chart-box { background: var(--card); padding: 10px; border-radius: 15px; border: 1px solid #222; margin-bottom: 15px; height: 150px; }
-        button { width: 100%; background: var(--neon); color: #000; border: none; padding: 20px; border-radius: 15px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+        button { width: 100%; background: var(--neon); color: #000; border: none; padding: 20px; border-radius: 15px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.3s; width: 100%; }
         button:disabled { background: #222; color: #444; }
         #status { font-size: 0.75rem; color: #555; text-align: center; margin-top: 10px; }
     </style>
@@ -27,7 +26,7 @@
 <div class="container">
     <div class="header">
         <h1>NETSCAN ULTRA PRO</h1>
-        <div id="ip-info" style="font-size: 0.7rem; color: #444;">IDLE</div>
+        <div id="ip-info" style="font-size: 0.7rem; color: #444;">PRONTO PARA TESTAR</div>
     </div>
     <div class="grid">
         <div class="card"><span class="label">Ping</span><div class="value" id="ping">--<span class="unit">ms</span></div></div>
@@ -37,7 +36,7 @@
     </div>
     <div class="chart-box"><canvas id="liveChart"></canvas></div>
     <button id="btn" onclick="start()">INICIAR DIAGNÓSTICO</button>
-    <div id="status">Rodando via GitHub Pages (Sem Limites).</div>
+    <div id="status">Versão Estável via GitHub Pages.</div>
 </div>
 <script>
 let chart;
@@ -72,17 +71,20 @@ async function start() {
         const jitter = Math.max(...pings) - Math.min(...pings);
         document.getElementById('ping').innerHTML = avgPing + '<span class="unit">ms</span>';
         document.getElementById('jitter').innerHTML = jitter + '<span class="unit">ms</span>';
+        
         status.innerText = "Medindo Download...";
         const dStart = Date.now();
         const res = await fetch('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js');
         const b = await res.blob();
         const dMbps = ((b.size * 8) / ((Date.now() - dStart) / 1000)) / 1000000;
         document.getElementById('download').innerHTML = dMbps.toFixed(2) + '<span class="unit">Mbps</span>';
+        
         status.innerText = "Medindo Upload...";
         const uStart = Date.now();
         await fetch('https://httpbin.org/post', { method: 'POST', body: b.slice(0, 100000) });
         const uMbps = ((100000 * 8) / ((Date.now() - uStart) / 1000)) / 1000000;
         document.getElementById('upload').innerHTML = uMbps.toFixed(2) + '<span class="unit">Mbps</span>';
+        
         status.innerText = "Teste Finalizado!";
     } catch(e) { status.innerText = "Erro de conexão."; } finally { btn.disabled = false; }
 }
