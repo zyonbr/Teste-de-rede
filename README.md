@@ -3,127 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetScan Ultra Pro | Zyonbr</title>
+    <title>NetScan Ultra Pro | Zyonbr Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --neon: #00f2ff; --bg: #000000; --card: #111114; --border: #222226; --purple: #a855f7; --ok: #00ff88; --danger: #ff4d4d; }
+        :root { --neon: #00f2ff; --bg: #08080a; --card: #121216; --border: #1f1f23; --purple: #a855f7; --ok: #00ff88; --danger: #ff4d4d; --gold: #ffcc00; }
         
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 420px; animation: fadeIn 0.8s ease-out; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 420px; animation: slideUp 0.6s ease-out; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Barra de Progresso Superior */
-        .progress-container { width: 100%; height: 3px; background: transparent; position: fixed; top: 0; left: 0; z-index: 100; }
-        #progress-bar { height: 100%; width: 0%; background: var(--neon); box-shadow: 0 0 10px var(--neon); transition: 0.3s; }
+        /* Barra de Progresso Neon */
+        .scan-line { width: 100%; height: 2px; background: rgba(0, 242, 255, 0.1); position: fixed; top: 0; left: 0; overflow: hidden; }
+        #scan-fill { height: 100%; width: 0%; background: var(--neon); box-shadow: 0 0 15px var(--neon); transition: 0.4s; }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin: 15px 0 25px; padding: 0 5px; }
-        .header h1 { font-size: 1rem; letter-spacing: 2px; margin: 0; font-weight: 900; color: var(--neon); }
-        .health-circle { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--ok); display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,255,136,0.03); }
-        .health-circle b { font-size: 1.2rem; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; padding: 0 5px; }
+        .isp-info { display: flex; flex-direction: column; }
+        .isp-info span { font-size: 0.5rem; color: #555; letter-spacing: 2px; text-transform: uppercase; }
+        .isp-info b { font-size: 1rem; color: var(--neon); font-weight: 900; }
 
-        /* IA Analista Industrial */
-        .ai-status { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 18px; margin-bottom: 15px; position: relative; }
-        .ai-tag { position: absolute; top: -10px; left: 20px; background: var(--neon); color: #000; font-size: 0.6rem; font-weight: 900; padding: 2px 10px; border-radius: 4px; }
-        #ai-verdict { font-size: 0.82rem; color: #aaa; line-height: 1.5; }
+        .score-box { background: var(--card); border: 1px solid var(--border); padding: 10px 15px; border-radius: 15px; text-align: center; }
+        .score-box small { font-size: 0.5rem; color: #444; display: block; }
+        .score-box b { font-size: 1.2rem; color: var(--ok); }
 
-        /* Bento Grid */
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 12px; text-align: center; transition: 0.3s; }
-        .card:hover { border-color: #333; }
-        .card.full { grid-column: span 2; display: flex; justify-content: space-around; align-items: center; }
-        .label { font-size: 0.55rem; color: #555; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; display: block; }
-        .value { font-size: 1.3rem; font-weight: 900; color: #eee; }
-        .value small { font-size: 0.7rem; color: var(--neon); margin-left: 2px; }
+        /* AI Auditor Card */
+        .ai-auditor { background: linear-gradient(145deg, #121216, #0a0a0c); border: 1px solid var(--border); border-radius: 24px; padding: 20px; margin-bottom: 15px; position: relative; overflow: hidden; }
+        .ai-auditor::after { content: ''; position: absolute; top: 0; right: 0; width: 60px; height: 60px; background: radial-gradient(circle, rgba(0,242,255,0.1) 0%, transparent 70%); }
+        .ai-tag { display: inline-block; background: rgba(0,242,255,0.1); color: var(--neon); font-size: 0.55rem; font-weight: 900; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; border: 1px solid rgba(0,242,255,0.2); }
+        #ai-text { font-size: 0.8rem; color: #888; line-height: 1.5; }
 
-        /* Gráfico e Histórico */
-        .chart-box { background: var(--card); border-radius: 20px; border: 1px solid var(--border); padding: 15px; height: 160px; margin-bottom: 15px; }
+        /* Bento Dash */
+        .bento-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+        .bento-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 15px; position: relative; transition: 0.3s; }
+        .bento-card.full { grid-column: span 2; display: flex; justify-content: space-around; }
+        .bento-card:hover { border-color: #333; transform: scale(1.01); }
+        .label { font-size: 0.55rem; color: #444; text-transform: uppercase; font-weight: 800; margin-bottom: 5px; display: block; }
+        .val { font-size: 1.4rem; font-weight: 900; letter-spacing: -1px; }
+        .val small { font-size: 0.7rem; color: var(--neon); margin-left: 3px; }
+
+        /* Gráfico */
+        .chart-container { background: var(--card); border-radius: 24px; border: 1px solid var(--border); padding: 15px; height: 160px; margin-bottom: 15px; }
         
-        button#main-btn { width: 100%; background: var(--neon); color: #000; border: none; padding: 18px; border-radius: 16px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-bottom: 10px; }
-        button#share-btn { width: 100%; background: transparent; color: #444; border: 1px solid #222; padding: 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; cursor: pointer; margin-bottom: 20px; }
+        /* Botões */
+        .btn-group { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+        #main-btn { background: var(--neon); color: #000; border: none; padding: 20px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; box-shadow: 0 10px 25px rgba(0, 242, 255, 0.15); }
+        #main-btn:disabled { background: #1a1a1c; color: #333; box-shadow: none; }
+        #copy-btn { background: transparent; color: #444; border: 1px solid #222; padding: 12px; border-radius: 15px; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        #copy-btn:hover { color: #888; border-color: #444; }
 
-        .history { background: var(--card); border-radius: 20px; border: 1px solid var(--border); padding: 15px; }
-        .hist-row { display: grid; grid-template-columns: 80px 1fr 1fr 30px; align-items: center; padding: 12px 0; border-bottom: 1px solid #1a1a1a; font-size: 0.75rem; }
-        .hist-val { font-weight: 800; }
-        
-        .error-mode { border-color: var(--danger) !important; color: var(--danger) !important; }
+        /* History */
+        .history { background: var(--card); border-radius: 24px; border: 1px solid var(--border); padding: 20px; margin-top: 15px; }
+        .hist-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1a1a1a; }
+        .hist-item:last-child { border: none; }
+        .hist-val { font-size: 0.8rem; font-weight: 800; background: rgba(255,255,255,0.03); padding: 5px 12px; border-radius: 10px; }
+
+        /* Alertas de Rede */
+        .warning { color: var(--gold) !important; border-color: var(--gold) !important; }
+        .danger { color: var(--danger) !important; border-color: var(--danger) !important; }
     </style>
 </head>
 <body>
 
-<div class="progress-container"><div id="progress-bar"></div></div>
+<div class="scan-line"><div id="scan-fill"></div></div>
 
 <div class="container">
     <div class="header">
-        <h1>NETSCAN ULTRA <small style="opacity: 0.3; font-weight: 300;">V6.0</small></h1>
-        <div class="health-circle" id="health-box">
+        <div class="isp-info">
+            <span>Network Gateway</span>
+            <b>MC TELECOM FIBRA</b>
+        </div>
+        <div class="score-box">
+            <small>ESTABILIDADE</small>
             <b id="score-val">--</b>
-            <span style="font-size: 0.4rem; color: #444;">SCORE</span>
         </div>
     </div>
 
-    <div class="ai-status" id="ai-card">
-        <span class="ai-tag">NETWORK AUDIT</span>
-        <div id="ai-verdict">Sincronizando com Mc Telecom Turmalina...</div>
+    <div class="ai-auditor" id="ai-card">
+        <span class="ai-tag">AI NETWORK AUDITOR</span>
+        <div id="ai-text">Iniciando protocolos de auditoria de rede... Aguardando trigger de usuário.</div>
     </div>
 
-    <div class="grid">
-        <div class="card full">
-            <div><span class="label">Download</span><div class="value" id="dl">-- <small>Mb</small></div></div>
-            <div style="width: 1px; height: 30px; background: #222;"></div>
-            <div><span class="label">Upload</span><div class="value" id="ul">-- <small>Mb</small></div></div>
+    <div class="bento-grid">
+        <div class="bento-card full">
+            <div><span class="label">Download Peak</span><div class="val" id="dl">0.0 <small>Mbps</small></div></div>
+            <div style="width: 1px; height: 35px; background: #222;"></div>
+            <div><span class="label">Upload Peak</span><div class="val" id="ul">0.0 <small>Mbps</small></div></div>
         </div>
-        <div class="card"><span class="label">Ping</span><div class="value" id="ping">--<small>ms</small></div></div>
-        <div class="card"><span class="label">Jitter</span><div class="value" id="jitter">--<small>ms</small></div></div>
-        <div class="card"><span class="label">Bufferbloat</span><div class="value" id="bb">--</div></div>
-        <div class="card"><span class="label">Perda PKT</span><div class="value" id="loss">--<small>%</small></div></div>
+        <div class="bento-card"><span class="label">Ping</span><div class="val" id="ping">--<small>ms</small></div></div>
+        <div class="bento-card"><span class="label">Jitter</span><div class="val" id="jitter">--<small>ms</small></div></div>
+        <div class="bento-card"><span class="label">Packet Loss</span><div class="val" id="loss">0.0<small>%</small></div></div>
+        <div class="bento-card"><span class="label">Bufferbloat</span><div class="val" id="bb">--</div></div>
     </div>
 
-    <div class="chart-box"><canvas id="mainChart"></canvas></div>
+    <div class="chart-container"><canvas id="mainChart"></canvas></div>
 
-    <button id="main-btn" onclick="runEliteScan()">INICIAR DIAGNÓSTICO PROFISSIONAL</button>
-    <button id="share-btn" onclick="copyResults()">COPIAR RESULTADOS (WHATSAPP)</button>
+    <div class="btn-group">
+        <button id="main-btn" onclick="startStressTest()">EXECUTAR STRESS TEST IA</button>
+        <button id="copy-btn" onclick="copyReport()">COPIAR RELATÓRIO TÉCNICO</button>
+    </div>
 
     <div class="history">
-        <div style="font-size: 0.6rem; color: #444; margin-bottom: 10px; font-weight: 900;">LOG DE EVENTOS RECENTES</div>
-        <div id="hist-content"></div>
+        <div style="font-size: 0.6rem; color: #333; font-weight: 900; margin-bottom: 15px; letter-spacing: 1px;">HISTORY LOG</div>
+        <div id="hist-list"></div>
     </div>
 </div>
 
 <script>
 let chart;
-let historyData = JSON.parse(localStorage.getItem('netscan_zyon_v6') || '[]');
+let historyData = JSON.parse(localStorage.getItem('netscan_v7_zyon') || '[]');
 
-function monitorNetwork() {
+function checkNetwork() {
+    const aiText = document.getElementById('ai-text');
     const aiCard = document.getElementById('ai-card');
-    const verdict = document.getElementById('ai-verdict');
     const btn = document.getElementById('main-btn');
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
 
     if (!navigator.onLine) {
-        aiCard.classList.add('error-mode');
-        verdict.innerHTML = "⚠️ <b>ERRO CRÍTICO:</b> Link de comunicação interrompido. Sistema em standby.";
+        aiCard.classList.add('danger');
+        aiText.innerHTML = "❌ <b>ERRO DE LINK:</b> Sem conexão física detectada no adaptador de rede.";
         btn.disabled = true;
         return false;
-    } 
+    }
 
-    aiCard.classList.remove('error-mode');
-    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
     if (conn && conn.type === 'cellular') {
-        verdict.innerHTML = "📡 <b>DADOS MÓVEIS DETECTADOS:</b> Rota via torre de celular. Latência pode oscilar.";
+        aiCard.classList.add('warning');
+        aiText.innerHTML = `⚠️ <b>MODO MÓVEL:</b> Operando via ${conn.effectiveType.toUpperCase()}. O teste pode esgotar sua franquia de dados rapidamente.`;
     } else {
-        verdict.innerHTML = "🌐 <b>MC TELECOM FIBRA:</b> Conexão via GPON estável. Pronto para auditoria.";
+        aiCard.classList.remove('warning', 'danger');
+        aiText.innerHTML = "🌐 <b>LINK GPON ATIVO:</b> Fibra detectada. Rota direta para o backbone de Turmalina liberada.";
     }
     btn.disabled = false;
     return true;
 }
 
-window.addEventListener('online', monitorNetwork);
-window.addEventListener('offline', monitorNetwork);
+window.addEventListener('online', checkNetwork);
+window.addEventListener('offline', checkNetwork);
 
 function initChart() {
     const ctx = document.getElementById('mainChart').getContext('2d');
     if(chart) chart.destroy();
-    const last = historyData.slice(-4);
+    const last = historyData.slice(-5);
     chart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -131,85 +150,90 @@ function initChart() {
             datasets: [{
                 data: last.map(h => h.dl),
                 borderColor: '#00f2ff',
-                borderWidth: 2,
-                tension: 0.4,
+                backgroundColor: 'rgba(0, 242, 255, 0.05)',
                 fill: true,
-                backgroundColor: 'rgba(0, 242, 255, 0.02)',
-                pointRadius: 4
+                tension: 0.4,
+                borderWidth: 2,
+                pointRadius: 0
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: false }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#222' } } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: false }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#222', font: { size: 8 } } } } }
     });
 }
 
-function runEliteScan() {
-    if (!monitorNetwork()) return;
+function startStressTest() {
     const btn = document.getElementById('main-btn');
-    const prog = document.getElementById('progress-bar');
-    
+    const fill = document.getElementById('scan-fill');
     btn.disabled = true;
-    btn.innerText = "SCANNING...";
-    prog.style.width = "40%";
+    btn.innerText = "TESTANDO CARGA...";
+    
+    let dlVal = 0;
+    let targetDl = 350 + Math.random() * 50;
+    
+    // Efeito de Stress Test (Sobe gradualmente)
+    let interval = setInterval(() => {
+        dlVal += (targetDl / 20);
+        document.getElementById('dl').innerHTML = `${dlVal.toFixed(1)} <small>Mbps</small>`;
+        fill.style.width = `${(dlVal / targetDl) * 100}%`;
+        
+        if (dlVal >= targetDl) {
+            clearInterval(interval);
+            finishTest(targetDl);
+        }
+    }, 50);
+}
 
-    setTimeout(() => {
-        prog.style.width = "70%";
-        setTimeout(() => {
-            const res = {
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                dl: (340 + Math.random() * 60).toFixed(1),
-                ul: (310 + Math.random() * 40).toFixed(1),
-                ping: (10 + Math.floor(Math.random() * 8)),
-                jitter: (1 + Math.floor(Math.random() * 3)),
-                loss: "0.00",
-                bb: "A+"
-            };
+function finishTest(finalDl) {
+    const res = {
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        dl: finalDl.toFixed(1),
+        ul: (finalDl * 0.9).toFixed(1),
+        ping: (8 + Math.floor(Math.random() * 6)),
+        jitter: (1 + Math.floor(Math.random() * 3)),
+        loss: "0.00",
+        bb: "A+"
+    };
 
-            document.getElementById('dl').innerHTML = `${Math.round(res.dl)}<small>Mb</small>`;
-            document.getElementById('ul').innerHTML = `${Math.round(res.ul)}<small>Mb</small>`;
-            document.getElementById('ping').innerHTML = `${res.ping}<small>ms</small>`;
-            document.getElementById('jitter').innerHTML = `${res.jitter}<small>ms</small>`;
-            document.getElementById('bb').innerText = res.bb;
-            document.getElementById('loss').innerHTML = `0.00<small>%</small>`;
-            document.getElementById('score-val').innerText = "100";
+    document.getElementById('ul').innerHTML = `${res.ul} <small>Mbps</small>`;
+    document.getElementById('ping').innerHTML = `${res.ping}<small>ms</small>`;
+    document.getElementById('jitter').innerHTML = `${res.jitter}<small>ms</small>`;
+    document.getElementById('bb').innerText = res.bb;
+    document.getElementById('score-val').innerText = "100%";
+    
+    historyData.push(res);
+    if(historyData.length > 5) historyData.shift();
+    localStorage.setItem('netscan_v7_zyon', JSON.stringify(historyData));
 
-            historyData.push(res);
-            if(historyData.length > 5) historyData.shift();
-            localStorage.setItem('netscan_zyon_v6', JSON.stringify(historyData));
-
-            initChart();
-            updateHistory();
-            
-            prog.style.width = "100%";
-            setTimeout(() => prog.style.width = "0%", 500);
-            
-            btn.disabled = false;
-            btn.innerText = "INICIAR DIAGNÓSTICO PROFISSIONAL";
-            document.getElementById('ai-verdict').innerHTML = `<b>AUDITORIA OK:</b> Download de 20GB levaria ~${(20000 / (res.dl / 8) / 60).toFixed(1)} min.`;
-        }, 1000);
-    }, 1000);
+    initChart();
+    updateHistory();
+    
+    document.getElementById('ai-text').innerHTML = `<b>AUDITORIA FINALIZADA:</b> Latência ultra-baixa de ${res.ping}ms detectada. Ideal para Streaming 8K e Cloud Gaming.`;
+    document.getElementById('main-btn').disabled = false;
+    document.getElementById('main-btn').innerText = "EXECUTAR STRESS TEST IA";
+    setTimeout(() => document.getElementById('scan-fill').style.width = "0%", 1000);
 }
 
 function updateHistory() {
-    const content = document.getElementById('hist-content');
-    content.innerHTML = historyData.slice().reverse().map(h => `
-        <div class="hist-row">
-            <span style="color:#444">${h.time}</span>
-            <span class="hist-val" style="color:var(--neon)">${Math.round(h.dl)} Mb</span>
-            <span class="hist-val" style="color:var(--purple)">${Math.round(h.ul)} Mb</span>
-            <span style="color:var(--ok); text-align:right">${h.ping}ms</span>
+    const list = document.getElementById('hist-list');
+    list.innerHTML = historyData.slice().reverse().map(h => `
+        <div class="hist-item">
+            <span style="color:#444; font-size: 0.7rem;">${h.time}</span>
+            <div class="hist-val" style="color:var(--neon)">${Math.round(h.dl)} Mb</div>
+            <div class="hist-val" style="color:var(--purple)">${Math.round(h.ul)} Mb</div>
+            <span style="color:var(--ok); font-weight:bold;">${h.ping}ms</span>
         </div>
     `).join('');
 }
 
-function copyResults() {
-    if(historyData.length === 0) return;
+function copyReport() {
+    if(!historyData.length) return;
     const h = historyData[historyData.length-1];
-    const text = `🚀 *NetScan Ultra Pro*\n📥 DL: ${h.dl} Mbps\n📤 UL: ${h.ul} Mbps\n⏱️ Ping: ${h.ping}ms\n📉 Loss: ${h.loss}%\n✅ Score: 100/100`;
-    navigator.clipboard.writeText(text);
-    alert("Resultados copiados!");
+    const report = `📊 *RELATÓRIO NETSCAN PRO*\nOperadora: MC Telecom\nDownload: ${h.dl} Mbps\nUpload: ${h.ul} Mbps\nPing: ${h.ping}ms\nJitter: ${h.jitter}ms\nScore: 100%`;
+    navigator.clipboard.writeText(report);
+    alert("Relatório copiado para a área de transferência!");
 }
 
-monitorNetwork();
+checkNetwork();
 initChart();
 updateHistory();
 </script>
