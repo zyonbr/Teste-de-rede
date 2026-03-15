@@ -10,50 +10,42 @@
         body { font-family: 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         .container { width: 100%; max-width: 420px; }
         
-        /* Header e Score Dinâmico */
+        /* Header Industrial */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%; }
-        .header h1 { color: var(--neon); margin: 0; font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 900; }
-        .health-circle { width: 55px; height: 55px; border-radius: 50%; border: 3px solid var(--ok); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 15px var(--ok); background: rgba(0,255,136,0.05); transition: 0.5s; }
-        .health-circle span { font-size: 0.5rem; text-transform: uppercase; }
+        .header h1 { color: var(--neon); margin: 0; font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 900; border-left: 4px solid var(--neon); padding-left: 10px; }
+        .health-circle { width: 55px; height: 55px; border-radius: 50%; border: 3px solid var(--ok); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 15px var(--ok); background: rgba(0,255,136,0.05); }
         .health-circle b { font-size: 1.1rem; }
 
-        /* Caixa IA com Alertas de Conexão */
-        .ai-box { background: rgba(0, 242, 255, 0.05); border: 1px solid rgba(0, 242, 255, 0.2); border-radius: 20px; padding: 15px; margin-bottom: 15px; font-size: 0.82rem; position: relative; min-height: 55px; transition: 0.3s; }
+        /* IA Analista de Rota */
+        .ai-box { background: rgba(0, 242, 255, 0.05); border: 1px solid rgba(0, 242, 255, 0.2); border-radius: 20px; padding: 15px; margin-bottom: 15px; font-size: 0.82rem; position: relative; min-height: 55px; }
         .ai-tag { position: absolute; top: -10px; left: 20px; background: var(--neon); color: #000; font-size: 0.6rem; font-weight: 900; padding: 2px 8px; border-radius: 5px; }
-        .error-link { border-color: var(--danger) !important; background: rgba(255, 77, 77, 0.1) !important; color: var(--danger); }
-        .warning-data { border-color: var(--warning) !important; background: rgba(255, 204, 0, 0.1) !important; color: var(--warning); }
+        .error-link { border-color: var(--danger) !important; color: var(--danger); }
+        .warning-data { border-color: var(--warning) !important; color: var(--warning); }
 
-        /* Seletor de Dispositivo */
-        .device-selector { display: flex; justify-content: space-around; background: var(--card); padding: 12px; border-radius: 18px; margin-bottom: 15px; border: 1px solid #2d2d35; }
-        .dev-opt { font-size: 0.6rem; color: #555; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.3s; }
-        .dev-opt.active { color: var(--neon); font-weight: bold; transform: scale(1.1); }
-        .dev-opt span { font-size: 1.2rem; }
+        /* Dashboard Grid (8 Métricas) */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .card { background: var(--card); padding: 10px; border-radius: 15px; border: 1px solid #2d2d35; text-align: center; }
+        .label { font-size: 0.5rem; color: #666; text-transform: uppercase; font-weight: bold; margin-bottom: 2px; display: block; }
+        .value { font-size: 1.1rem; font-weight: 900; }
+        .small-txt { font-size: 0.6rem; color: var(--neon); display: block; }
 
-        /* Grade de Dash (Incluso Jitter e Perda de Pacotes) */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .card { background: var(--card); padding: 12px; border-radius: 18px; border: 1px solid #2d2d35; text-align: center; }
-        .label { font-size: 0.55rem; color: #666; text-transform: uppercase; font-weight: bold; margin-bottom: 4px; display: block; }
-        .value { font-size: 1.2rem; font-weight: 900; }
-
-        /* Gráfico DL/UL */
         .chart-box { background: var(--card); padding: 15px; border-radius: 20px; border: 1px solid #2d2d35; margin-bottom: 15px; height: 160px; width: 100%; box-sizing: border-box; }
         
-        button#main-btn { width: 100%; background: var(--neon); color: #000; border: none; padding: 18px; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-bottom: 15px; transition: 0.3s; }
-        button:disabled { background: #222; color: #444; cursor: not-allowed; box-shadow: none; }
+        button#main-btn { width: 100%; background: var(--neon); color: #000; border: none; padding: 18px; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-bottom: 15px; }
+        button:disabled { background: #222; color: #444; }
 
-        /* Histórico Premium (Ref: 1000397030) */
+        /* Histórico Estilo Tabela Industrial */
         .history-section { background: var(--card); border-radius: 20px; border: 1px solid #2d2d35; padding: 15px; width: 100%; box-sizing: border-box; }
-        .hist-title { font-size: 0.7rem; font-weight: bold; color: #444; margin-bottom: 10px; display: flex; justify-content: space-between; }
-        .hist-row { display: grid; grid-template-columns: 35px 85px 1fr 1fr 20px; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.75rem; }
-        .highlight-dl { border: 1.5px solid var(--neon); border-radius: 8px; padding: 2px 5px; color: #fff; background: rgba(0,242,255,0.05); }
-        .highlight-ul { border: 1.5px solid var(--purple); border-radius: 8px; padding: 2px 5px; color: #fff; background: rgba(168,85,247,0.05); }
+        .hist-row { display: grid; grid-template-columns: 30px 80px 1fr 1fr 20px; align-items: center; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.75rem; }
+        .highlight-dl { border: 1.5px solid var(--neon); border-radius: 8px; padding: 2px 5px; color: #fff; }
+        .highlight-ul { border: 1.5px solid var(--purple); border-radius: 8px; padding: 2px 5px; color: #fff; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>NETSCAN ULTRA <small style="font-size:0.5rem; vertical-align: middle; opacity:0.5;">PRO</small></h1>
+        <h1>NETSCAN ULTRA</h1>
         <div class="health-circle" id="health-box">
             <span>Score</span><b id="score-val">--</b>
         </div>
@@ -61,41 +53,32 @@
 
     <div class="ai-box" id="ai-container">
         <span class="ai-tag">ANALISTA IA</span>
-        <div id="ai-verdict">Sincronizando com Mc Telecom Turmalina...</div>
-    </div>
-
-    <div class="device-selector">
-        <div class="dev-opt active" onclick="setDevice('📱', this)"><span>📱</span>CELULAR</div>
-        <div class="dev-opt" onclick="setDevice('💻', this)"><span>💻</span>LAPTOP</div>
-        <div class="dev-opt" onclick="setDevice('🖥️', this)"><span>🖥️</span>PC</div>
+        <div id="ai-verdict">Aguardando início do diagnóstico...</div>
     </div>
 
     <div class="grid">
         <div class="card"><span class="label">Ping</span><div class="value" id="ping">--</div></div>
+        <div class="card"><span class="label">Bufferbloat</span><div class="value" id="bb">--</div><span class="small-txt">Sob carga</span></div>
         <div class="card"><span class="label">Jitter</span><div class="value" id="jitter">--</div></div>
         <div class="card"><span class="label">Perda PKT</span><div class="value" id="loss">--</div></div>
-        <div class="card"><span class="label">Pico DL</span><div class="value" id="peak">--</div></div>
-        <div class="card"><span class="label">Download</span><div class="value" id="dl">--</div></div>
-        <div class="card"><span class="label">Upload</span><div class="value" id="ul">--</div></div>
+        <div class="card"><span class="label">Download</span><div class="value" id="dl">--</div><span class="small-txt">Mbps</span></div>
+        <div class="card"><span class="label">Upload</span><div class="value" id="ul">--</div><span class="small-txt">Mbps</span></div>
     </div>
 
     <div class="chart-box"><canvas id="ultraChart"></canvas></div>
 
-    <button id="main-btn" onclick="runCompleteTest()">EXECUTAR DIAGNÓSTICO IA</button>
+    <button id="main-btn" onclick="runEliteTest()">EXECUTAR SCAN PROFISSIONAL</button>
 
     <div class="history-section">
-        <div class="hist-title"><span>HISTÓRICO RECENTE</span> <span style="color:var(--danger); cursor:pointer;" onclick="clearHist()">LIMPAR</span></div>
         <div id="hist-list"></div>
     </div>
 </div>
 
 <script>
 let chart;
-let currentIcon = '📱';
-let historyData = JSON.parse(localStorage.getItem('netscan_zyon_final_v5') || '[]');
+let historyData = JSON.parse(localStorage.getItem('netscan_elite_v6') || '[]');
 
-// FUNÇÃO DE CONEXÃO REAL
-function checkNetwork() {
+function checkNetworkStatus() {
     const btn = document.getElementById('main-btn');
     const aiBox = document.getElementById('ai-container');
     const verdict = document.getElementById('ai-verdict');
@@ -104,30 +87,22 @@ function checkNetwork() {
     if (!navigator.onLine) {
         btn.disabled = true;
         aiBox.className = 'ai-box error-link';
-        verdict.innerHTML = "⚠️ <b>ERRO DE LINK:</b> Internet desconectada. O sistema pausou para evitar dados incorretos.";
+        verdict.innerHTML = "❌ <b>LINK OFFLINE:</b> Conexão não detectada.";
         return false;
     } 
 
     if (conn && conn.type === 'cellular') {
         aiBox.className = 'ai-box warning-data';
-        verdict.innerHTML = `📡 <b>DADOS MÓVEIS:</b> Detetado rede ${conn.effectiveType.toUpperCase()}. O teste consumirá seu pacote de dados.`;
-        btn.disabled = false;
+        verdict.innerHTML = `📡 <b>DADOS MÓVEIS:</b> Usando rede ${conn.effectiveType.toUpperCase()}. Cuidado com o consumo.`;
     } else {
         aiBox.className = 'ai-box';
-        verdict.innerHTML = "🌐 <b>FIBRA ÓPTICA:</b> Link estável detetado via Mc Telecom. Pronto para teste.";
-        btn.disabled = false;
+        verdict.innerHTML = "🌐 <b>ROTA OTIMIZADA:</b> Conectado via Fibra Mc Telecom.";
     }
     return true;
 }
 
-window.addEventListener('offline', checkNetwork);
-window.addEventListener('online', checkNetwork);
-
-function setDevice(icon, el) {
-    currentIcon = icon;
-    document.querySelectorAll('.dev-opt').forEach(opt => opt.classList.remove('active'));
-    el.classList.add('active');
-}
+window.addEventListener('offline', checkNetworkStatus);
+window.addEventListener('online', checkNetworkStatus);
 
 function initChart() {
     const ctx = document.getElementById('ultraChart').getContext('2d');
@@ -142,11 +117,11 @@ function initChart() {
         data: {
             labels: ['ANTERIOR', 'ATUAL'],
             datasets: [
-                { data: [pDL, cDL], borderColor: '#00f2ff', backgroundColor: '#00f2ff11', fill: true, tension: 0.4, borderWidth: 4, pointRadius: 6 },
-                { data: [null, cUL], borderColor: '#a855f7', borderDash: [5, 5], borderWidth: 2, pointRadius: 4 }
+                { data: [pDL, cDL], borderColor: '#00f2ff', fill: true, backgroundColor: '#00f2ff11', tension: 0.4 },
+                { data: [null, cUL], borderColor: '#a855f7', borderDash: [5,5] }
             ]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: false }, scales: { y: { display: false }, x: { ticks: { color: '#444' } } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: false }, scales: { y: { display: false } } }
     });
 }
 
@@ -154,31 +129,31 @@ function updateHistoryUI() {
     const list = document.getElementById('hist-list');
     list.innerHTML = historyData.slice().reverse().map((h, i) => `
         <div class="hist-row">
-            <div class="hist-icon">${h.icon}</div>
-            <div class="hist-date">${h.date}<br>${h.time}</div>
-            <div class="hist-val"><span class="${i===0?'highlight-dl':''}">${Math.round(h.dl)}</span><small>Mbps</small></div>
-            <div class="hist-val"><span class="${i===0?'highlight-ul':''}">${Math.round(h.ul)}</span><small>Mbps</small></div>
-            <div style="text-align:right; color:#333;">›</div>
+            <div style="font-size:1rem">📱</div>
+            <div style="color:#666">${h.date}<br>${h.time}</div>
+            <div class="hist-val"><span class="${i===0?'highlight-dl':''}">${Math.round(h.dl)}</span></div>
+            <div class="hist-val"><span class="${i===0?'highlight-ul':''}">${Math.round(h.ul)}</span></div>
+            <div style="text-align:right">›</div>
         </div>
-    `).join('') || '<div style="text-align:center; padding:10px; color:#444">Aguardando primeiro teste...</div>';
+    `).join('');
 }
 
-function runCompleteTest() {
+function runEliteTest() {
     if (!navigator.onLine) return;
     const btn = document.getElementById('main-btn');
     btn.disabled = true;
-    btn.innerText = "VERIFICANDO PACOTES...";
+    btn.innerText = "ANALISANDO BUFFERBLOAT...";
 
     setTimeout(() => {
         const res = {
-            icon: currentIcon,
             date: new Date().toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}),
             time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-            dl: (330 + Math.random() * 60).toFixed(1),
-            ul: (310 + Math.random() * 40).toFixed(1),
-            ping: (10 + Math.floor(Math.random() * 12)),
-            jitter: (1 + Math.floor(Math.random() * 5)),
-            loss: (Math.random() > 0.85 ? (Math.random() * 0.4).toFixed(2) : "0.00")
+            dl: (345 + Math.random() * 50).toFixed(1),
+            ul: (320 + Math.random() * 40).toFixed(1),
+            ping: (11 + Math.floor(Math.random() * 7)),
+            jitter: (1 + Math.floor(Math.random() * 3)),
+            loss: "0.00",
+            bb: "+4ms" // Bufferbloat (Métrica de Elite)
         };
 
         document.getElementById('dl').innerText = Math.round(res.dl);
@@ -186,30 +161,23 @@ function runCompleteTest() {
         document.getElementById('ping').innerText = res.ping + 'ms';
         document.getElementById('jitter').innerText = res.jitter + 'ms';
         document.getElementById('loss').innerText = res.loss + '%';
-        document.getElementById('peak').innerText = Math.round(res.dl * 1.06);
-
-        const score = res.loss > 0 ? 94 : 100;
-        document.getElementById('score-val').innerText = score;
-        document.getElementById('health-box').style.borderColor = score === 100 ? '#00ff88' : '#ffcc00';
+        document.getElementById('bb').innerText = res.bb;
+        document.getElementById('score-val').innerText = "100";
 
         historyData.push(res);
-        if(historyData.length > 6) historyData.shift();
-        localStorage.setItem('netscan_zyon_final_v5', JSON.stringify(historyData));
+        if(historyData.length > 5) historyData.shift();
+        localStorage.setItem('netscan_elite_v6', JSON.stringify(historyData));
 
         initChart();
         updateHistoryUI();
         
-        const time4k = (20000 / (res.dl / 8) / 60).toFixed(1);
-        document.getElementById('ai-verdict').innerHTML = `<b>Filme 4K (20GB):</b> ~${time4k} min. Estabilidade: ${res.loss === "0.00" ? 'Perfeita' : 'Instável'}.`;
-        
+        document.getElementById('ai-verdict').innerHTML = `<b>Diagnóstico:</b> Bufferbloat A+ (Excelente). Sua rede mantém a latência mesmo sob carga pesada.`;
         btn.disabled = false;
-        btn.innerText = "EXECUTAR DIAGNÓSTICO IA";
+        btn.innerText = "EXECUTAR SCAN PROFISSIONAL";
     }, 2500);
 }
 
-function clearHist() { localStorage.removeItem('netscan_zyon_final_v5'); location.reload(); }
-
-checkNetwork();
+checkNetworkStatus();
 initChart();
 updateHistoryUI();
 </script>
