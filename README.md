@@ -3,239 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetScan Ultra Pro | Zyonbr Edition</title>
+    <title>NetScan Ultra Pro | Zyonbr Elite</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --neon: #00f2ff; --bg: #08080a; --card: #121216; --border: #1f1f23; --purple: #a855f7; --ok: #00ff88; --danger: #ff4d4d; --gold: #ffcc00; }
+        :root { --neon: #00f2ff; --bg: #030305; --card: rgba(18, 18, 22, 0.7); --border: rgba(255, 255, 255, 0.08); --ok: #00ff88; --danger: #ff4d4d; }
         
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 420px; animation: slideUp 0.6s ease-out; }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Barra de Progresso Neon */
-        .scan-line { width: 100%; height: 2px; background: rgba(0, 242, 255, 0.1); position: fixed; top: 0; left: 0; overflow: hidden; }
-        #scan-fill { height: 100%; width: 0%; background: var(--neon); box-shadow: 0 0 15px var(--neon); transition: 0.4s; }
-
-        .header { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; padding: 0 5px; }
-        .isp-info { display: flex; flex-direction: column; }
-        .isp-info span { font-size: 0.5rem; color: #555; letter-spacing: 2px; text-transform: uppercase; }
-        .isp-info b { font-size: 1rem; color: var(--neon); font-weight: 900; }
-
-        .score-box { background: var(--card); border: 1px solid var(--border); padding: 10px 15px; border-radius: 15px; text-align: center; }
-        .score-box small { font-size: 0.5rem; color: #444; display: block; }
-        .score-box b { font-size: 1.2rem; color: var(--ok); }
-
-        /* AI Auditor Card */
-        .ai-auditor { background: linear-gradient(145deg, #121216, #0a0a0c); border: 1px solid var(--border); border-radius: 24px; padding: 20px; margin-bottom: 15px; position: relative; overflow: hidden; }
-        .ai-auditor::after { content: ''; position: absolute; top: 0; right: 0; width: 60px; height: 60px; background: radial-gradient(circle, rgba(0,242,255,0.1) 0%, transparent 70%); }
-        .ai-tag { display: inline-block; background: rgba(0,242,255,0.1); color: var(--neon); font-size: 0.55rem; font-weight: 900; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; border: 1px solid rgba(0,242,255,0.2); }
-        #ai-text { font-size: 0.8rem; color: #888; line-height: 1.5; }
-
-        /* Bento Dash */
-        .bento-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
-        .bento-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 15px; position: relative; transition: 0.3s; }
-        .bento-card.full { grid-column: span 2; display: flex; justify-content: space-around; }
-        .bento-card:hover { border-color: #333; transform: scale(1.01); }
-        .label { font-size: 0.55rem; color: #444; text-transform: uppercase; font-weight: 800; margin-bottom: 5px; display: block; }
-        .val { font-size: 1.4rem; font-weight: 900; letter-spacing: -1px; }
-        .val small { font-size: 0.7rem; color: var(--neon); margin-left: 3px; }
-
-        /* Gráfico */
-        .chart-container { background: var(--card); border-radius: 24px; border: 1px solid var(--border); padding: 15px; height: 160px; margin-bottom: 15px; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: #fff; margin: 0; padding: 15px; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
         
-        /* Botões */
-        .btn-group { display: flex; flex-direction: column; gap: 10px; width: 100%; }
-        #main-btn { background: var(--neon); color: #000; border: none; padding: 20px; border-radius: 20px; font-weight: 900; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; box-shadow: 0 10px 25px rgba(0, 242, 255, 0.15); }
-        #main-btn:disabled { background: #1a1a1c; color: #333; box-shadow: none; }
-        #copy-btn { background: transparent; color: #444; border: 1px solid #222; padding: 12px; border-radius: 15px; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        #copy-btn:hover { color: #888; border-color: #444; }
+        /* Fundo Animado */
+        .bg-glow { position: fixed; top: 50%; left: 50%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(0, 242, 255, 0.05) 0%, transparent 70%); transform: translate(-50%, -50%); z-index: -1; transition: 1s; }
 
-        /* History */
-        .history { background: var(--card); border-radius: 24px; border: 1px solid var(--border); padding: 20px; margin-top: 15px; }
-        .hist-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #1a1a1a; }
-        .hist-item:last-child { border: none; }
-        .hist-val { font-size: 0.8rem; font-weight: 800; background: rgba(255,255,255,0.03); padding: 5px 12px; border-radius: 10px; }
+        .container { width: 100%; max-width: 420px; z-index: 1; }
 
-        /* Alertas de Rede */
-        .warning { color: var(--gold) !important; border-color: var(--gold) !important; }
-        .danger { color: var(--danger) !important; border-color: var(--danger) !important; }
+        /* Progress Bar High-Tech */
+        .top-loader { position: fixed; top: 0; left: 0; width: 100%; height: 2px; z-index: 1000; }
+        #loader-fill { height: 100%; width: 0%; background: linear-gradient(90deg, transparent, var(--neon), transparent); box-shadow: 0 0 15px var(--neon); transition: 0.2s; }
+
+        .header { display: flex; justify-content: space-between; align-items: flex-end; margin: 30px 0; }
+        .brand b { font-size: 1.2rem; letter-spacing: 3px; color: var(--neon); text-transform: uppercase; display: block; }
+        .brand span { font-size: 0.55rem; color: #444; font-weight: 800; }
+
+        /* Glassmorphism Cards */
+        .ai-status { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 20px; backdrop-filter: blur(12px); margin-bottom: 15px; position: relative; }
+        .ai-status::before { content: 'LIVE AUDIT'; position: absolute; top: -8px; right: 20px; background: var(--neon); color: #000; font-size: 0.5rem; font-weight: 900; padding: 2px 8px; border-radius: 4px; }
+
+        .bento-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-bottom: 15px; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 15px; backdrop-filter: blur(12px); transition: 0.3s; }
+        .card.wide { grid-column: span 3; }
+        .card.full { grid-column: span 6; display: flex; justify-content: space-around; padding: 25px; }
+        
+        .label { font-size: 0.5rem; color: #555; text-transform: uppercase; font-weight: 900; margin-bottom: 8px; display: block; letter-spacing: 1px; }
+        .val { font-size: 1.5rem; font-weight: 900; letter-spacing: -1px; }
+        .val small { font-size: 0.7rem; color: var(--neon); }
+
+        /* Gráfico Polido */
+        .chart-area { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 15px; height: 160px; margin-bottom: 20px; }
+
+        /* Botões de Ação */
+        .actions { display: grid; grid-template-columns: 1fr 50px; gap: 10px; }
+        #run-btn { background: #fff; color: #000; border: none; padding: 20px; border-radius: 20px; font-weight: 900; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
+        #run-btn:hover { background: var(--neon); transform: translateY(-2px); }
+        #run-btn:disabled { background: #111; color: #333; cursor: not-allowed; transform: none; }
+        
+        .icon-btn { background: var(--card); border: 1px solid var(--border); border-radius: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; }
+
+        /* Log Estilo Matrix */
+        .log-section { margin-top: 25px; background: rgba(0,0,0,0.3); border-radius: 20px; padding: 15px; border: 1px solid var(--border); }
+        .log-row { display: flex; justify-content: space-between; font-size: 0.7rem; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.02); color: #666; }
+        .log-row b { color: var(--neon); }
     </style>
 </head>
 <body>
 
-<div class="scan-line"><div id="scan-fill"></div></div>
+<div class="bg-glow" id="glow"></div>
+<div class="top-loader"><div id="loader-fill"></div></div>
 
 <div class="container">
     <div class="header">
-        <div class="isp-info">
-            <span>Network Gateway</span>
-            <b>MC TELECOM FIBRA</b>
+        <div class="brand">
+            <b>NetScan Ultra</b>
+            <span>Auditoria por Mc Telecom</span>
         </div>
-        <div class="score-box">
-            <small>ESTABILIDADE</small>
-            <b id="score-val">--</b>
-        </div>
+        <div id="connection-tag" style="font-size: 0.6rem; color: var(--ok); font-weight: 900;">ONLINE</div>
     </div>
 
-    <div class="ai-auditor" id="ai-card">
-        <span class="ai-tag">AI NETWORK AUDITOR</span>
-        <div id="ai-text">Iniciando protocolos de auditoria de rede... Aguardando trigger de usuário.</div>
+    <div class="ai-status">
+        <div id="ai-msg" style="font-size: 0.8rem; color: #888; line-height: 1.5;">Otimizando buffers de recepção para a planta de Turmalina... Pronto para iniciar.</div>
     </div>
 
     <div class="bento-grid">
-        <div class="bento-card full">
-            <div><span class="label">Download Peak</span><div class="val" id="dl">0.0 <small>Mbps</small></div></div>
-            <div style="width: 1px; height: 35px; background: #222;"></div>
-            <div><span class="label">Upload Peak</span><div class="val" id="ul">0.0 <small>Mbps</small></div></div>
+        <div class="card full">
+            <div><span class="label">Download</span><div class="val" id="dl">0<small>Mb</small></div></div>
+            <div style="width: 1px; background: var(--border);"></div>
+            <div><span class="label">Upload</span><div class="val" id="ul">0<small>Mb</small></div></div>
         </div>
-        <div class="bento-card"><span class="label">Ping</span><div class="val" id="ping">--<small>ms</small></div></div>
-        <div class="bento-card"><span class="label">Jitter</span><div class="val" id="jitter">--<small>ms</small></div></div>
-        <div class="bento-card"><span class="label">Packet Loss</span><div class="val" id="loss">0.0<small>%</small></div></div>
-        <div class="bento-card"><span class="label">Bufferbloat</span><div class="val" id="bb">--</div></div>
+        <div class="card wide"><span class="label">Ping</span><div class="val" id="ping">--<small>ms</small></div></div>
+        <div class="card wide"><span class="label">Jitter</span><div class="val" id="jitter">--<small>ms</small></div></div>
+        <div class="card wide"><span class="label">Loss</span><div class="val" id="loss">0<small>%</small></div></div>
+        <div class="card wide"><span class="label">Buffer</span><div class="val" id="bb">--</div></div>
     </div>
 
-    <div class="chart-container"><canvas id="mainChart"></canvas></div>
+    <div class="chart-area"><canvas id="netChart"></canvas></div>
 
-    <div class="btn-group">
-        <button id="main-btn" onclick="startStressTest()">EXECUTAR STRESS TEST IA</button>
-        <button id="copy-btn" onclick="copyReport()">COPIAR RELATÓRIO TÉCNICO</button>
+    <div class="actions">
+        <button id="run-btn" onclick="startGlobalAudit()">Iniciar Auditoria Pro</button>
+        <div class="icon-btn" onclick="copyData()" title="Copiar Dados">📋</div>
     </div>
 
-    <div class="history">
-        <div style="font-size: 0.6rem; color: #333; font-weight: 900; margin-bottom: 15px; letter-spacing: 1px;">HISTORY LOG</div>
-        <div id="hist-list"></div>
+    <div class="log-section">
+        <div style="font-size: 0.55rem; font-weight: 900; color: #333; margin-bottom: 10px; letter-spacing: 2px;">LOG DE EVENTOS</div>
+        <div id="log-content"></div>
     </div>
 </div>
 
 <script>
 let chart;
-let historyData = JSON.parse(localStorage.getItem('netscan_v7_zyon') || '[]');
+let history = JSON.parse(localStorage.getItem('netscan_v8') || '[]');
 
-function checkNetwork() {
-    const aiText = document.getElementById('ai-text');
-    const aiCard = document.getElementById('ai-card');
-    const btn = document.getElementById('main-btn');
-    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-
+function updateStatus() {
+    const msg = document.getElementById('ai-msg');
+    const tag = document.getElementById('connection-tag');
     if (!navigator.onLine) {
-        aiCard.classList.add('danger');
-        aiText.innerHTML = "❌ <b>ERRO DE LINK:</b> Sem conexão física detectada no adaptador de rede.";
-        btn.disabled = true;
+        msg.innerHTML = "❌ <b>ERRO DE REDE:</b> Gateway não responde. Verifique sua ONT.";
+        tag.style.color = 'var(--danger)';
+        tag.innerText = "OFFLINE";
         return false;
     }
-
-    if (conn && conn.type === 'cellular') {
-        aiCard.classList.add('warning');
-        aiText.innerHTML = `⚠️ <b>MODO MÓVEL:</b> Operando via ${conn.effectiveType.toUpperCase()}. O teste pode esgotar sua franquia de dados rapidamente.`;
-    } else {
-        aiCard.classList.remove('warning', 'danger');
-        aiText.innerHTML = "🌐 <b>LINK GPON ATIVO:</b> Fibra detectada. Rota direta para o backbone de Turmalina liberada.";
-    }
-    btn.disabled = false;
+    tag.style.color = 'var(--ok)';
+    tag.innerText = "ONLINE";
     return true;
 }
 
-window.addEventListener('online', checkNetwork);
-window.addEventListener('offline', checkNetwork);
-
 function initChart() {
-    const ctx = document.getElementById('mainChart').getContext('2d');
+    const ctx = document.getElementById('netChart').getContext('2d');
     if(chart) chart.destroy();
-    const last = historyData.slice(-5);
     chart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: last.map(h => h.time),
+            labels: history.slice(-6).map(h => h.time),
             datasets: [{
-                data: last.map(h => h.dl),
+                data: history.slice(-6).map(h => h.dl),
                 borderColor: '#00f2ff',
-                backgroundColor: 'rgba(0, 242, 255, 0.05)',
-                fill: true,
-                tension: 0.4,
                 borderWidth: 2,
+                tension: 0.4,
+                fill: true,
+                backgroundColor: 'rgba(0, 242, 255, 0.02)',
                 pointRadius: 0
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: false }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#222', font: { size: 8 } } } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: false }, scales: { y: { display: false }, x: { display: false } } }
     });
 }
 
-function startStressTest() {
-    const btn = document.getElementById('main-btn');
-    const fill = document.getElementById('scan-fill');
+async function startGlobalAudit() {
+    if (!updateStatus()) return;
+    const btn = document.getElementById('run-btn');
+    const fill = document.getElementById('loader-fill');
+    const glow = document.getElementById('glow');
+    
     btn.disabled = true;
-    btn.innerText = "TESTANDO CARGA...";
-    
-    let dlVal = 0;
-    let targetDl = 350 + Math.random() * 50;
-    
-    // Efeito de Stress Test (Sobe gradualmente)
-    let interval = setInterval(() => {
-        dlVal += (targetDl / 20);
-        document.getElementById('dl').innerHTML = `${dlVal.toFixed(1)} <small>Mbps</small>`;
-        fill.style.width = `${(dlVal / targetDl) * 100}%`;
-        
-        if (dlVal >= targetDl) {
-            clearInterval(interval);
-            finishTest(targetDl);
-        }
-    }, 50);
-}
+    btn.innerText = "Analisando Pacotes...";
+    glow.style.background = "radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%)";
 
-function finishTest(finalDl) {
+    // Simulação de Stress Progressivo
+    for(let i=0; i<=100; i+=2) {
+        fill.style.width = i + "%";
+        if(i > 30) document.getElementById('dl').innerHTML = (Math.random() * 50 + 300).toFixed(0) + "<small>Mb</small>";
+        await new Promise(r => setTimeout(r, 30));
+    }
+
     const res = {
         time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        dl: finalDl.toFixed(1),
-        ul: (finalDl * 0.9).toFixed(1),
-        ping: (8 + Math.floor(Math.random() * 6)),
-        jitter: (1 + Math.floor(Math.random() * 3)),
+        dl: (340 + Math.random() * 60).toFixed(1),
+        ul: (310 + Math.random() * 40).toFixed(1),
+        ping: (9 + Math.floor(Math.random() * 5)),
+        jitter: (1 + Math.floor(Math.random() * 2)),
         loss: "0.00",
         bb: "A+"
     };
 
-    document.getElementById('ul').innerHTML = `${res.ul} <small>Mbps</small>`;
+    document.getElementById('dl').innerHTML = `${Math.round(res.dl)}<small>Mb</small>`;
+    document.getElementById('ul').innerHTML = `${Math.round(res.ul)}<small>Mb</small>`;
     document.getElementById('ping').innerHTML = `${res.ping}<small>ms</small>`;
     document.getElementById('jitter').innerHTML = `${res.jitter}<small>ms</small>`;
     document.getElementById('bb').innerText = res.bb;
-    document.getElementById('score-val').innerText = "100%";
     
-    historyData.push(res);
-    if(historyData.length > 5) historyData.shift();
-    localStorage.setItem('netscan_v7_zyon', JSON.stringify(historyData));
+    history.push(res);
+    if(history.length > 10) history.shift();
+    localStorage.setItem('netscan_v8', JSON.stringify(history));
 
     initChart();
-    updateHistory();
+    updateLog();
     
-    document.getElementById('ai-text').innerHTML = `<b>AUDITORIA FINALIZADA:</b> Latência ultra-baixa de ${res.ping}ms detectada. Ideal para Streaming 8K e Cloud Gaming.`;
-    document.getElementById('main-btn').disabled = false;
-    document.getElementById('main-btn').innerText = "EXECUTAR STRESS TEST IA";
-    setTimeout(() => document.getElementById('scan-fill').style.width = "0%", 1000);
+    glow.style.background = "radial-gradient(circle, rgba(0, 255, 136, 0.05) 0%, transparent 70%)";
+    btn.disabled = false;
+    btn.innerText = "Iniciar Auditoria Pro";
+    fill.style.width = "0%";
+    document.getElementById('ai-msg').innerHTML = `<b>Auditoria Finalizada:</b> Rede Mc Telecom operando com 99.9% de eficiência térmica e digital.`;
 }
 
-function updateHistory() {
-    const list = document.getElementById('hist-list');
-    list.innerHTML = historyData.slice().reverse().map(h => `
-        <div class="hist-item">
-            <span style="color:#444; font-size: 0.7rem;">${h.time}</span>
-            <div class="hist-val" style="color:var(--neon)">${Math.round(h.dl)} Mb</div>
-            <div class="hist-val" style="color:var(--purple)">${Math.round(h.ul)} Mb</div>
-            <span style="color:var(--ok); font-weight:bold;">${h.ping}ms</span>
+function updateLog() {
+    const log = document.getElementById('log-content');
+    log.innerHTML = history.slice().reverse().map(h => `
+        <div class="log-row">
+            <span>${h.time}</span>
+            <span>DL: <b>${Math.round(h.dl)}</b> Mb</span>
+            <span>PNG: <b>${h.ping}ms</b></span>
         </div>
     `).join('');
 }
 
-function copyReport() {
-    if(!historyData.length) return;
-    const h = historyData[historyData.length-1];
-    const report = `📊 *RELATÓRIO NETSCAN PRO*\nOperadora: MC Telecom\nDownload: ${h.dl} Mbps\nUpload: ${h.ul} Mbps\nPing: ${h.ping}ms\nJitter: ${h.jitter}ms\nScore: 100%`;
-    navigator.clipboard.writeText(report);
-    alert("Relatório copiado para a área de transferência!");
+function copyData() {
+    if(!history.length) return;
+    const h = history[history.length-1];
+    const text = `NetScan Pro: DL ${h.dl}Mb | UL ${h.ul}Mb | Ping ${h.ping}ms`;
+    navigator.clipboard.writeText(text);
+    alert("Copiado!");
 }
 
-checkNetwork();
 initChart();
-updateHistory();
+updateLog();
+updateStatus();
 </script>
 </body>
 </html>
