@@ -15,9 +15,12 @@
         .health-circle { width: 55px; height: 55px; border-radius: 50%; border: 3px solid var(--ok); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 15px var(--ok); background: rgba(0,255,136,0.05); }
         .health-circle b { font-size: 1.1rem; }
 
-        .ai-box { background: rgba(0, 242, 255, 0.05); border: 1px solid rgba(0, 242, 255, 0.2); border-radius: 20px; padding: 15px; margin-bottom: 15px; font-size: 0.82rem; position: relative; min-height: 50px; }
+        .ai-box { background: rgba(0, 242, 255, 0.05); border: 1px solid rgba(0, 242, 255, 0.2); border-radius: 20px; padding: 15px; margin-bottom: 15px; font-size: 0.82rem; position: relative; min-height: 50px; transition: 0.3s; }
         .ai-tag { position: absolute; top: -10px; left: 20px; background: var(--neon); color: #000; font-size: 0.6rem; font-weight: 900; padding: 2px 8px; border-radius: 5px; }
-        .error-link { color: var(--danger) !important; font-weight: bold; border-color: var(--danger) !important; }
+        
+        /* Cores de Alerta */
+        .error-link { color: var(--danger) !important; border-color: var(--danger) !important; background: rgba(255, 77, 77, 0.1) !important; }
+        .warning-data { color: var(--warning) !important; border-color: var(--warning) !important; background: rgba(255, 204, 0, 0.1) !important; }
 
         .device-selector { display: flex; justify-content: space-around; background: var(--card); padding: 12px; border-radius: 18px; margin-bottom: 15px; border: 1px solid #2d2d35; }
         .dev-opt { font-size: 0.6rem; color: #555; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
@@ -31,7 +34,7 @@
         .chart-box { background: var(--card); padding: 15px; border-radius: 20px; border: 1px solid #2d2d35; margin-bottom: 15px; height: 180px; width: 100%; box-sizing: border-box; }
         
         button#main-btn { width: 100%; background: var(--neon); color: #000; border: none; padding: 18px; border-radius: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-bottom: 15px; }
-        button:disabled { background: #222; color: #444; cursor: not-allowed; box-shadow: none; }
+        button:disabled { background: #222; color: #444; cursor: not-allowed; }
 
         .history-section { background: var(--card); border-radius: 20px; border: 1px solid #2d2d35; padding: 15px; width: 100%; box-sizing: border-box; }
         .hist-row { display: grid; grid-template-columns: 35px 85px 1fr 1fr 20px; align-items: center; padding: 12px 0; border-bottom: 1px solid #222; font-size: 0.8rem; }
@@ -50,7 +53,7 @@
     </div>
 
     <div class="ai-box" id="ai-container">
-        <span class="ai-tag">ANALISTA IA</span>
+        <span class="ai-tag" id="ai-label">ANALISTA IA</span>
         <div id="ai-verdict">Sincronizando com o gateway local...</div>
     </div>
 
@@ -79,29 +82,38 @@
 <script>
 let chart;
 let currentIcon = '📱';
-let historyData = JSON.parse(localStorage.getItem('netscan_final_v2') || '[]');
+let historyData = JSON.parse(localStorage.getItem('netscan_v3_zyon') || '[]');
 
-// VERIFICAÇÃO DE CONEXÃO REAL (Correção solicitada)
-function checkConnectivity() {
+// DETECTOR DE REDE (Dados Móveis vs Fibra)
+function updateNetworkStatus() {
     const btn = document.getElementById('main-btn');
     const aiBox = document.getElementById('ai-container');
     const verdict = document.getElementById('ai-verdict');
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
 
     if (!navigator.onLine) {
         btn.disabled = true;
-        aiBox.classList.add('error-link');
-        verdict.innerHTML = "⚠️ <b>ERRO DE LINK:</b> Sem conexão com a Internet. O diagnóstico foi interrompido para evitar dados falsos.";
+        aiBox.className = 'ai-box error-link';
+        verdict.innerHTML = "⚠️ <b>ERRO DE LINK:</b> Sem conexão. Ligue o Wi-Fi ou Dados Móveis.";
         return false;
-    } else {
+    } 
+
+    if (conn && conn.type === 'cellular') {
+        aiBox.className = 'ai-box warning-data';
+        verdict.innerHTML = `📡 <b>DADOS MÓVEIS ATIVOS:</b> Cuidado! O teste de velocidade pode consumir seu pacote de dados (${conn.effectiveType.toUpperCase()}).`;
         btn.disabled = false;
-        aiBox.classList.remove('error-link');
-        return true;
+    } else {
+        aiBox.className = 'ai-box';
+        verdict.innerHTML = "🌐 <b>FIBRA ÓPTICA:</b> Conexão estável detectada via Wi-Fi/Ethernet. Pronto para o teste.";
+        btn.disabled = false;
     }
+    return true;
 }
 
-// Monitora mudanças de rede em tempo real
-window.addEventListener('offline', checkConnectivity);
-window.addEventListener('online', checkConnectivity);
+// Escutadores de evento para mudança de rede
+window.addEventListener('offline', updateNetworkStatus);
+window.addEventListener('online', updateNetworkStatus);
+if (navigator.connection) navigator.connection.addEventListener('change', updateNetworkStatus);
 
 function setDevice(icon, el) {
     currentIcon = icon;
@@ -145,19 +157,13 @@ function updateHistoryUI() {
 }
 
 function runSupernovaTest() {
-    if (!checkConnectivity()) return; // Bloqueia o teste se estiver offline
+    if (!navigator.onLine) return;
 
     const btn = document.getElementById('main-btn');
     btn.disabled = true;
-    btn.innerText = "CALCULANDO...";
+    btn.innerText = "TESTANDO...";
 
     setTimeout(() => {
-        if (!navigator.onLine) { // Verificação dupla no meio do processo
-            checkConnectivity();
-            btn.innerText = "EXECUTAR TESTE IA";
-            return;
-        }
-
         const res = {
             icon: currentIcon,
             date: new Date().toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'2-digit'}),
@@ -175,13 +181,13 @@ function runSupernovaTest() {
 
         historyData.push(res);
         if(historyData.length > 8) historyData.shift();
-        localStorage.setItem('netscan_final_v2', JSON.stringify(historyData));
+        localStorage.setItem('netscan_v3_zyon', JSON.stringify(historyData));
 
         initChart();
         updateHistoryUI();
         
         const time4k = (20000 / (res.dl / 8) / 60).toFixed(1);
-        document.getElementById('ai-verdict').innerHTML = `<b>Filme 4K (20GB):</b> ~${time4k} min. A estabilidade está em nível máximo industrial.`;
+        document.getElementById('ai-verdict').innerHTML = `<b>Filme 4K (20GB):</b> ~${time4k} min. Teste finalizado com sucesso.`;
         
         btn.disabled = false;
         btn.innerText = "EXECUTAR TESTE IA";
@@ -189,7 +195,7 @@ function runSupernovaTest() {
 }
 
 // Inicialização
-checkConnectivity();
+updateNetworkStatus();
 initChart();
 updateHistoryUI();
 </script>
