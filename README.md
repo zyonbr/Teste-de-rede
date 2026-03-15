@@ -14,6 +14,7 @@
         .header h1 { color: var(--neon); margin: 0; font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 900; }
         .line { width: 50px; height: 3px; background: var(--neon); margin: 10px auto; border-radius: 2px; }
 
+        /* AI Analysis Box */
         .ai-box { background: rgba(0, 242, 255, 0.05); border: 1px solid rgba(0, 242, 255, 0.3); border-radius: 20px; padding: 15px; margin-bottom: 15px; font-size: 0.85rem; position: relative; }
         .ai-tag { position: absolute; top: -10px; left: 20px; background: var(--neon); color: #000; font-size: 0.6rem; font-weight: 900; padding: 2px 8px; border-radius: 5px; }
         #ai-verdict { color: #ccc; line-height: 1.4; }
@@ -24,23 +25,24 @@
         .value { font-size: 1.6rem; font-weight: 900; }
         .unit { font-size: 0.7rem; color: var(--neon); margin-left: 2px; }
         
-        /* Deltas de Comparativo */
+        /* Comparativos (Deltas) */
         .delta { font-size: 0.65rem; font-weight: bold; margin-top: 5px; display: block; height: 12px; }
         .up { color: var(--ok); }
         .down { color: var(--danger); }
         .stable { color: #555; }
 
-        .chart-box { background: var(--card); padding: 15px; border-radius: 20px; border: 1px solid #2d2d35; margin-bottom: 15px; height: 200px; }
+        .chart-box { background: var(--card); padding: 15px; border-radius: 20px; border: 1px solid #2d2d35; margin-bottom: 15px; height: 210px; }
         
         button#main-btn { width: 100%; background: var(--neon); color: #000; border: none; padding: 20px; border-radius: 20px; font-weight: 900; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; transition: 0.3s; box-shadow: 0 10px 20px rgba(0, 242, 255, 0.2); }
-        button:disabled { background: #222; color: #444; box-shadow: none; cursor: not-allowed; }
+        button:disabled { background: #222; color: #444; cursor: not-allowed; }
 
+        /* Histórico */
         .history-section { background: var(--card); border-radius: 20px; border: 2px solid #2d2d35; padding: 15px; margin-top: 25px; }
         .hist-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .hist-head h2 { font-size: 0.8rem; margin: 0; color: var(--neon); text-transform: uppercase; }
         .clear-btn { font-size: 0.6rem; color: var(--danger); cursor: pointer; border: 1px solid var(--danger); padding: 3px 8px; border-radius: 5px; }
         
-        .hist-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; font-size: 0.75rem; color: #aaa; }
+        .hist-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #222; font-size: 0.75rem; color: #aaa; }
         .hist-item b { color: var(--neon); }
     </style>
 </head>
@@ -54,7 +56,7 @@
 
     <div class="ai-box">
         <span class="ai-tag">ANALISTA IA</span>
-        <div id="ai-verdict">Inicie o diagnóstico para gerar a curva comparativa de desempenho.</div>
+        <div id="ai-verdict">Execute o diagnóstico para comparar a eficiência térmica da rede.</div>
     </div>
 
     <div class="grid">
@@ -81,14 +83,14 @@
     </div>
 
     <div class="chart-box">
-        <canvas id="trendChart"></canvas>
+        <canvas id="compChart"></canvas>
     </div>
 
-    <button id="main-btn" onclick="runUltraTest()">Iniciar Teste</button>
+    <button id="main-btn" onclick="runUltraTest()">Iniciar Diagnóstico</button>
 
     <div class="history-section">
         <div class="hist-head">
-            <h2>Histórico Recente</h2>
+            <h2>Registro de Atividades</h2>
             <div class="clear-btn" onclick="clearHistory()">Limpar</div>
         </div>
         <div id="hist-list"></div>
@@ -96,36 +98,45 @@
 </div>
 
 <script>
-let trendChart;
-let historyData = JSON.parse(localStorage.getItem('netscan_zyon') || '[]');
+let chart;
+let historyData = JSON.parse(localStorage.getItem('netscan_zyon_final') || '[]');
 
-function initChart() {
-    const ctx = document.getElementById('trendChart').getContext('2d');
-    if(trendChart) trendChart.destroy();
+function initSmartChart() {
+    const ctx = document.getElementById('compChart').getContext('2d');
+    if(chart) chart.destroy();
     
-    // Pegamos apenas os dois últimos para o comparativo direto (estilo curva do forno)
-    const dataset = historyData.slice(-2).map(h => parseFloat(h.dl));
-    const labels = dataset.length === 2 ? ['Anterior', 'Atual'] : ['Aguardando', 'Atual'];
-    
+    const dataPoints = historyData.slice(-2).map(h => parseFloat(h.dl));
+    let lineColor = '#00f2ff'; // Cor neutra inicial
+    let pointColors = ['#fff', '#fff'];
+
+    if (dataPoints.length === 2) {
+        if (dataPoints[1] > dataPoints[0]) {
+            lineColor = '#00ff88'; // Verde (Melhorou)
+            pointColors = ['#ff4d4d', '#00ff88'];
+        } else if (dataPoints[1] < dataPoints[0]) {
+            lineColor = '#ff4d4d'; // Vermelho (Piorou)
+            pointColors = ['#00ff88', '#ff4d4d'];
+        }
+    }
+
     const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-    gradient.addColorStop(0, 'rgba(0, 242, 255, 0.2)');
-    gradient.addColorStop(1, 'rgba(0, 242, 255, 0)');
+    gradient.addColorStop(0, lineColor + '33');
+    gradient.addColorStop(1, 'transparent');
 
-    trendChart = new Chart(ctx, {
+    chart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: labels,
+            labels: dataPoints.length === 2 ? ['Anterior', 'Atual'] : ['Aguardando', 'Atual'],
             datasets: [{
-                data: dataset.length ? dataset : [0, 0],
-                borderColor: '#00f2ff',
+                data: dataPoints.length ? dataPoints : [0, 0],
+                borderColor: lineColor,
                 backgroundColor: gradient,
-                borderWidth: 5,
+                borderWidth: 4,
                 fill: true,
-                tension: 0.4,
+                tension: 0.3,
                 pointRadius: 8,
-                pointBackgroundColor: '#fff',
-                pointBorderColor: '#00f2ff',
-                pointBorderWidth: 3
+                pointBackgroundColor: pointColors,
+                pointBorderWidth: 2
             }]
         },
         options: {
@@ -134,7 +145,7 @@ function initChart() {
             plugins: { legend: false },
             scales: {
                 y: { beginAtZero: true, max: 400, grid: { color: '#222' }, ticks: { color: '#444' } },
-                x: { grid: { display: false }, ticks: { color: '#fff', font: { weight: 'bold' } } }
+                x: { ticks: { color: '#fff', font: { weight: 'bold' } } }
             }
         }
     });
@@ -142,41 +153,36 @@ function initChart() {
 
 function updateDeltas(current) {
     if (historyData.length < 2) return;
-    const previous = historyData[historyData.length - 2];
+    const prev = historyData[historyData.length - 2];
 
-    const showDelta = (id, cur, prev, isInv = false) => {
-        const diff = cur - prev;
+    const calc = (id, cur, old, isInv = false) => {
+        const diff = cur - old;
         const el = document.getElementById(id);
-        if (diff === 0) { el.innerHTML = `<span class="stable">● Estável</span>`; return; }
+        if (diff === 0) { el.innerHTML = `<span class="stable">Estável</span>`; return; }
         
-        // Para ping/jitter (isInv), aumento (+) é ruim (vermelho)
         const isBetter = isInv ? diff < 0 : diff > 0;
         const sign = diff > 0 ? '▲ +' : '▼ ';
         el.innerHTML = `<span class="${isBetter ? 'up' : 'down'}">${sign}${Math.abs(diff).toFixed(1)}</span>`;
     };
 
-    showDelta('d-ping', current.ping, previous.ping, true);
-    showDelta('d-jitter', current.jitter, previous.jitter, true);
-    showDelta('d-dl', current.dl, previous.dl);
-    showDelta('d-ul', current.ul, previous.ul);
+    calc('d-ping', current.ping, prev.ping, true);
+    calc('d-jitter', current.jitter, prev.jitter, true);
+    calc('d-dl', current.dl, prev.dl);
+    calc('d-ul', current.ul, prev.ul);
 }
 
-function runIA(current) {
-    const verdict = document.getElementById('ai-verdict');
+function runIA(cur) {
+    const v = document.getElementById('ai-verdict');
     if (historyData.length < 2) {
-        verdict.innerHTML = "<b>Sincronização iniciada.</b> A IA agora monitora suas variações para prever instabilidades de fibra.";
+        v.innerHTML = "<b>Análise Preditiva Ativa.</b> Aguardando segundo ponto de dados para gerar curva de tendência.";
         return;
     }
     const prev = historyData[historyData.length - 2];
-    const diff = current.dl - prev.dl;
+    const diff = cur.dl - prev.dl;
 
-    if (Math.abs(diff) < 3) {
-        verdict.innerHTML = "A IA confirma <b>Consistência de Fibra</b>. Variação mínima detectada, rede operando em regime estável.";
-    } else if (diff > 0) {
-        verdict.innerHTML = `A IA detectou uma <b>Curva de Melhora</b>. Sua vazão de banda subiu ${diff.toFixed(1)} Mbps desde o último teste.`;
-    } else {
-        verdict.innerHTML = `A IA alerta para <b>Perda de Rendimento</b>. Queda de ${Math.abs(diff).toFixed(1)} Mbps detectada na curva atual.`;
-    }
+    if (Math.abs(diff) < 2) v.innerHTML = "A IA confirma <b>Consistência Máxima</b>. Sua conexão Mc Telecom está entregando um fluxo contínuo e estável.";
+    else if (diff > 0) v.innerHTML = `A IA detectou <b>Ascensão de Banda</b>. Melhoria de ${diff.toFixed(1)} Mbps identificada na curva atual.`;
+    else v.innerHTML = `A IA alerta para <b>Declínio Térmico</b>. Queda de ${Math.abs(diff).toFixed(1)} Mbps. Verifique se há muitos dispositivos ativos.`;
 }
 
 function runUltraTest() {
@@ -186,10 +192,10 @@ function runUltraTest() {
     setTimeout(() => {
         const res = {
             time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-            dl: (330 + Math.random() * 25).toFixed(1),
-            ul: (320 + Math.random() * 20).toFixed(1),
-            ping: (20 + Math.floor(Math.random() * 10)),
-            jitter: (2 + Math.floor(Math.random() * 8))
+            dl: (332 + Math.random() * 20).toFixed(1),
+            ul: (325 + Math.random() * 22).toFixed(1),
+            ping: (18 + Math.floor(Math.random() * 12)),
+            jitter: (1 + Math.floor(Math.random() * 7))
         };
 
         document.getElementById('dl').innerHTML = res.dl + '<span class="unit">Mbps</span>';
@@ -198,16 +204,16 @@ function runUltraTest() {
         document.getElementById('jitter').innerHTML = res.jitter + '<span class="unit">ms</span>';
 
         historyData.push(res);
-        if (historyData.length > 15) historyData.shift();
-        localStorage.setItem('netscan_zyon', JSON.stringify(historyData));
+        if (historyData.length > 10) historyData.shift();
+        localStorage.setItem('netscan_zyon_final', JSON.stringify(historyData));
 
-        initChart();
+        initSmartChart();
         updateDeltas(res);
         runIA(res);
         updateHistoryUI();
 
         btn.disabled = false;
-    }, 2500);
+    }, 2800);
 }
 
 function updateHistoryUI() {
@@ -222,14 +228,13 @@ function updateHistoryUI() {
 }
 
 function clearHistory() {
-    localStorage.removeItem('netscan_zyon');
-    historyData = [];
-    updateHistoryUI();
-    initChart();
-    location.reload();
+    if(confirm("Deseja resetar a IA e o histórico?")) {
+        localStorage.removeItem('netscan_zyon_final');
+        location.reload();
+    }
 }
 
-initChart();
+initSmartChart();
 updateHistoryUI();
 </script>
 </body>
